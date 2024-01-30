@@ -191,6 +191,8 @@ void notes_list_delete(NoteList *list) {
 	for (int i = 0; i < list->size; i++) {
 		notes_delete(list->list[i]);
 	}
+	// free the list data
+	free(list->list);
 	// free the list
 	free(list);
 }

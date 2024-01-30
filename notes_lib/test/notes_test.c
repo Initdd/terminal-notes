@@ -71,7 +71,11 @@ int main() {
     // create a new note list
     NoteList *list = notes_list_create();
     // add a note to the list
-    notes_list_add(list, notes_create("Hello World!", 1));
+    notes_list_add(list, notes_create("test1", 1));
+    notes_list_add(list, notes_create("test2", 2));
+    notes_list_add(list, notes_create("test3", 3));
+    notes_list_add(list, notes_create("test4", 4));
+    notes_list_add(list, notes_create("test5", 5));
     // save the list to a file
     notes_list_save(list, "test.txt", DEL);
     // delete the list
@@ -80,7 +84,7 @@ int main() {
     NoteList *list2 = notes_list_load("test.txt", DEL);
     // print the list
     char *str1 = notes_list_read(list2);
-    printf("List: %s\n", str1);
+    printf("List:\n%s\n", str1);
     free(str1);
     // delete the list
     notes_list_delete(list2);

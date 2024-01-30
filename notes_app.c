@@ -89,7 +89,7 @@ void init_display() {
 
 // Input handling
 
-void handle_input_main_window_list_notes(int key, int *selected_idx, int *main_window_mode, NoteList *note_list, int *selected_window, int *priority, char *data, int *note_id) {
+void handle_input_main_window_list_notes(int key, int *selected_idx, int *main_window_mode, NoteList *note_list, int *selected_window, int *priority, char **data, int *note_id) {
     switch (key) {
         case KEY_UP:
             *selected_idx = (*selected_idx - 1 + note_list->size) % note_list->size;
@@ -105,8 +105,11 @@ void handle_input_main_window_list_notes(int key, int *selected_idx, int *main_w
             *main_window_mode = 2;
             *selected_window = 1;
             // set the priority, data and note id
+            // start by allocating memory for the data (if not already allocated)
+            if (*data == NULL) *data = (char *)malloc(sizeof(char) * 256);
             *priority = note_list->list[*selected_idx]->prt;
-            strcpy(data, note_list->list[*selected_idx]->data);
+            // copy the data
+            strcpy(*data, note_list->list[*selected_idx]->data);
             *note_id = note_list->list[*selected_idx]->id;
             // reset the idx
             *selected_idx = 0;
@@ -117,7 +120,7 @@ void handle_input_main_window_list_notes(int key, int *selected_idx, int *main_w
 
 }
 
-void handle_input_main_window_new_note(int key, int *selected_idx, int *main_window_mode, NoteList *note_list, int *selected_window, int *priority, char *data) {
+void handle_input_main_window_new_note(int key, int *selected_idx, int *main_window_mode, NoteList *note_list, int *selected_window, int *priority, char **data) {
     switch (key) {
         case KEY_UP:
             *selected_idx = (*selected_idx - 1 + 3) % 3;
@@ -136,7 +139,7 @@ void handle_input_main_window_new_note(int key, int *selected_idx, int *main_win
                     Note *new_note = (Note *)malloc(sizeof(Note));
                     new_note->id = note_list->last_id++;
                     new_note->prt = *priority;
-                    strcpy(new_note->data, data);
+                    strcpy(new_note->data, *data);
                     notes_list_add(note_list, new_note);
                     // go back to the main window mode 0 (list notes)
                     *main_window_mode = 0;
@@ -145,7 +148,11 @@ void handle_input_main_window_new_note(int key, int *selected_idx, int *main_win
                     *selected_idx = 0;
                     // reset the priority and data
                     *priority = 0;
-                    *data = '\0';
+                    // free the data
+                    if (data != NULL) {
+                        free(data);
+                        data = NULL;
+                    }
                     break;
             }
             break;
@@ -161,13 +168,13 @@ void handle_input_main_window_new_note(int key, int *selected_idx, int *main_win
                     // check if the key is a printable character
                     if (key >= 32 && key <= 126) {
                         // add the key to the data
-                        int len = strlen(data);
-                        data[len] = key;
+                        int len = strlen(*data);
+                        *data[len] = key;
                         // add an end of string character
-                        data[len+1] = '\0';
+                        *data[len+1] = '\0';
                     } else if (key == KEY_BACKSPACE) {
                         // delete the last character
-                        data[strlen(data) - 1] = '\0';
+                        *data[strlen(*data) - 1] = '\0';
                     }
                     break;
                 default:
@@ -179,7 +186,7 @@ void handle_input_main_window_new_note(int key, int *selected_idx, int *main_win
     }
 }
 
-void handle_input_main_window_edit_note(int key, int *selected_idx, int *main_window_mode, NoteList *note_list, int *selected_window, int *priority, char *data, int *note_id) {
+void handle_input_main_window_edit_note(int key, int *selected_idx, int *main_window_mode, NoteList *note_list, int *selected_window, int *priority, char **data, int *note_id) {
     switch (key) {
         case KEY_UP:
             *selected_idx = (*selected_idx - 1 + 3) % 3;
@@ -197,13 +204,17 @@ void handle_input_main_window_edit_note(int key, int *selected_idx, int *main_wi
                     // edit the note
                     // update the note
                     Note *note = notes_list_get(note_list, *note_id);
-                    notes_update(note, data, *priority);
+                    notes_update(note, *data, *priority);
                     // go back to the main window mode 0 (list notes)
                     *main_window_mode = 0;
                     *selected_window = 1;
                     // reset the priority and data
                     *priority = 0;
-                    *data = '\0';
+                    // free the data
+                    if (*data != NULL) {
+                        free(*data);
+                        *data = NULL;
+                    }
                     // reset the idx
                     *selected_idx = 0;
                     break;
@@ -221,15 +232,15 @@ void handle_input_main_window_edit_note(int key, int *selected_idx, int *main_wi
                     // check if the key is a printable character
                     if (key >= 32 && key <= 126) {
                         // add the key to the data
-                        int len = strlen(data);
-                        data[len] = key;
+                        int len = strlen(*data);
+                        (*data)[len] = key;
                         // add an end of string character
-                        data[len+1] = '\0';
+                        (*data)[len+1] = '\0';
                     } else if (key == KEY_BACKSPACE) {
                         // delete the last character
-                        int len = strlen(data);
+                        int len = strlen(*data);
                         if (len > 0)
-                            data[len - 1] = '\0';
+                            (*data)[len - 1] = '\0';
                     }
                     break;
                 default:
@@ -241,7 +252,7 @@ void handle_input_main_window_edit_note(int key, int *selected_idx, int *main_wi
     }
 }
 
-void handle_input_main_window(int key, int *selected_idx, int *main_window_mode, NoteList *note_list, int *selected_window, int *priority, char *data, int *note_id) {
+void handle_input_main_window(int key, int *selected_idx, int *main_window_mode, NoteList *note_list, int *selected_window, int *priority, char **data, int *note_id) {
     // main window modes:
     // 0 - list notes, 1 - new note, 2 - edit note
     switch (key) {
@@ -262,7 +273,7 @@ void handle_input_main_window(int key, int *selected_idx, int *main_window_mode,
     }
 }
 
-void handle_input_menu(int key, int *selected_option, int option_count, int *selected_window, int selected_window_count, int *main_window_mode, int *selected_idx, int *priority, char *data) {
+void handle_input_menu(int key, int *selected_option, int option_count, int *selected_window, int selected_window_count, int *main_window_mode, int *selected_idx, int *priority, char **data) {
     switch (key) {
         case KEY_UP:
             *selected_option = (*selected_option - 1 + option_count) % option_count;
@@ -276,8 +287,13 @@ void handle_input_menu(int key, int *selected_option, int option_count, int *sel
         case 10:  // Enter
             *selected_idx = 0;
             // delete these two lines if wanna save the priority and data
+            // reset the priority and data
             *priority = 0;
-            *data = '\0';
+            if (*data != NULL) {
+                free(*data);
+                *data = NULL;
+            }
+            // check the selected button
             switch (*selected_option) {
                 case 0:  // list notes
                     *main_window_mode = 0;
@@ -286,9 +302,6 @@ void handle_input_menu(int key, int *selected_option, int option_count, int *sel
                 case 1:  // new note
                     *main_window_mode = 1;
                     *selected_window = 1;
-                    // reset the priority and data
-                    *priority = 0;
-                    data[0] = '\0';
                     break;
                 case 2:  // exit
                     end_app();
@@ -300,7 +313,7 @@ void handle_input_menu(int key, int *selected_option, int option_count, int *sel
     }
 }
 
-void handle_input(int *selected_option, int option_count, int *selected_window, int selected_window_count, int *main_window_mode, int *selected_idx, NoteList *note_list, int *priority, char *data, int *note_id) {
+void handle_input(int *selected_option, int option_count, int *selected_window, int selected_window_count, int *main_window_mode, int *selected_idx, NoteList *note_list, int *priority, char **data, int *note_id) {
     int key = getch();
     switch (key) {
         case KEY_LEFT:
@@ -348,7 +361,7 @@ void draw_menu_window(WINDOW *menu_win, int selected_option, char *menu_options[
     wrefresh(menu_win);
 }
 
-void draw_main_window(WINDOW *main_note_win, NoteList *note_list, int *selected_idx, int *main_window_mode, int selected, int *priority, char *data) {
+void draw_main_window(WINDOW *main_note_win, NoteList *note_list, int *selected_idx, int *main_window_mode, int selected, int *priority, char **data) {
     wclear(main_note_win);  // Clear the window
 
     // draw the window border
@@ -387,7 +400,7 @@ void draw_main_window(WINDOW *main_note_win, NoteList *note_list, int *selected_
 
         // data
         if (*selected_idx == 1 && selected) wattron(main_note_win, A_REVERSE);
-        mvwprintw(main_note_win, 2, 2, "Data: %s", data);
+        mvwprintw(main_note_win, 2, 2, "Data: %s", *data);
         if (*selected_idx == 1 && selected) wattroff(main_note_win, A_REVERSE);
 
         // submit
@@ -408,7 +421,7 @@ void draw_main_window(WINDOW *main_note_win, NoteList *note_list, int *selected_
 
         // data
         if (*selected_idx == 1 && selected) wattron(main_note_win, A_REVERSE);
-        mvwprintw(main_note_win, 2, 2, "Data: %s", data);
+        mvwprintw(main_note_win, 2, 2, "Data: %s", *data);
         if (*selected_idx == 1 && selected) wattroff(main_note_win, A_REVERSE);
 
         // submit
@@ -434,7 +447,7 @@ int main() {
 
     // utility variables
     int priority = 0;
-    char data[256] = "";
+    char *data = NULL; // will be used to make mallocs/reallocs/frees
     int note_id = 0;
     // selected window (0 - menu, 1 - main window)
     int selected_window = 0;
@@ -458,9 +471,9 @@ int main() {
     // Main loop
     while (!quit_flag) {
         draw_menu_window(menu_win, selected_option, menu_options, sizeof(menu_options) / sizeof(menu_options[0]), selected_window == 0);
-        draw_main_window(main_note_win, note_list, &selected_idx, &main_window_mode, selected_window == 1, &priority, data);
+        draw_main_window(main_note_win, note_list, &selected_idx, &main_window_mode, selected_window == 1, &priority, &data);
         handle_input(&selected_option, sizeof(menu_options) / sizeof(menu_options[0]), &selected_window,
-                    2, &main_window_mode, &selected_idx, note_list, &priority, data, &note_id);
+                    2, &main_window_mode, &selected_idx, note_list, &priority, &data, &note_id);
     }
 
     // close windows

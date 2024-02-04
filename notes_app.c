@@ -136,10 +136,8 @@ void handle_input_main_window_new_note(int key, int *selected_idx, int *main_win
                     break;
                 case 2:  // submit
                     // create a new note and add it to the list
-                    Note *new_note = (Note *)malloc(sizeof(Note));
-                    new_note->id = note_list->last_id++;
-                    new_note->prt = *priority;
-                    strcpy(new_note->data, *data);
+                    Note *new_note = notes_create(*data, *priority);
+                    // add the note to the list
                     notes_list_add(note_list, new_note);
                     // go back to the main window mode 0 (list notes)
                     *main_window_mode = 0;
@@ -149,9 +147,9 @@ void handle_input_main_window_new_note(int key, int *selected_idx, int *main_win
                     // reset the priority and data
                     *priority = 0;
                     // free the data
-                    if (data != NULL) {
-                        free(data);
-                        data = NULL;
+                    if (*data != NULL) {
+                        free(*data);
+                        *data = NULL;
                     }
                     break;
             }
@@ -169,12 +167,14 @@ void handle_input_main_window_new_note(int key, int *selected_idx, int *main_win
                     if (key >= 32 && key <= 126) {
                         // add the key to the data
                         int len = strlen(*data);
-                        *data[len] = key;
+                        (*data)[len] = key;
                         // add an end of string character
-                        *data[len+1] = '\0';
+                        (*data)[len+1] = '\0';
                     } else if (key == KEY_BACKSPACE) {
                         // delete the last character
-                        *data[strlen(*data) - 1] = '\0';
+                        int len = strlen(*data);
+                        if (len > 0)
+                            (*data)[len - 1] = '\0';
                     }
                     break;
                 default:
@@ -289,6 +289,7 @@ void handle_input_menu(int key, int *selected_option, int option_count, int *sel
             // delete these two lines if wanna save the priority and data
             // reset the priority and data
             *priority = 0;
+            // free the data
             if (*data != NULL) {
                 free(*data);
                 *data = NULL;
@@ -302,6 +303,11 @@ void handle_input_menu(int key, int *selected_option, int option_count, int *sel
                 case 1:  // new note
                     *main_window_mode = 1;
                     *selected_window = 1;
+                    // start by allocating memory for the data (if not already allocated)
+                    if (*data == NULL) *data = (char *)malloc(sizeof(char) * 256);
+                    // set default values for the priority and data
+                    *priority = 0;
+                    strcpy(*data, "");
                     break;
                 case 2:  // exit
                     end_app();

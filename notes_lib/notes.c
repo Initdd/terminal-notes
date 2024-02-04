@@ -174,9 +174,14 @@ void notes_list_remove(NoteList *list, int id) {
 	// if the note was not found, return
 	if (index == -1) return;
 	// remove the note
+	notes_delete(list->list[index]);
+	// move the notes after the removed note to the left
 	for (int i = index; i < list->size - 1; i++) {
 		list->list[i] = list->list[i + 1];
 	}
+	// set the last note to NULL
+	list->list[list->size - 1] = NULL;
+	// decrease the size
 	list->size--;
 }
 

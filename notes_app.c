@@ -121,18 +121,19 @@ void handle_input_main_window_list_notes(int key, int *selected_idx, int *main_w
 }
 
 void handle_input_main_window_new_note(int key, int *selected_idx, int *main_window_mode, NoteList *note_list, int *selected_window, int *priority, char **data) {
+    const int num_options = 3;
     switch (key) {
         case KEY_UP:
-            *selected_idx = (*selected_idx - 1 + 3) % 3;
+            *selected_idx = (*selected_idx - 1 + num_options) % num_options;
             break;
         case KEY_DOWN:
-            *selected_idx = (*selected_idx + 1) % 3;
+            *selected_idx = (*selected_idx + 1) % num_options;
             break;
         case 10:  // Enter
             switch (*selected_idx) {
                 case 0:  // priority
                 case 1:  // data
-                    *selected_idx = (*selected_idx + 1) % 3;
+                    *selected_idx = (*selected_idx + 1) % num_options;
                     break;
                 case 2:  // submit
                     // create a new note and add it to the list
@@ -151,6 +152,16 @@ void handle_input_main_window_new_note(int key, int *selected_idx, int *main_win
                         free(*data);
                         *data = NULL;
                     }
+                    break;
+            }
+            break;
+        case 113: // q
+            switch (*selected_idx) {
+                case 0:  // priority
+                case 2:  // submit
+                    end_app();
+                    break;
+                default:
                     break;
             }
             break;
@@ -187,18 +198,22 @@ void handle_input_main_window_new_note(int key, int *selected_idx, int *main_win
 }
 
 void handle_input_main_window_edit_note(int key, int *selected_idx, int *main_window_mode, NoteList *note_list, int *selected_window, int *priority, char **data, int *note_id) {
+    const int num_options = 4;
     switch (key) {
         case KEY_UP:
-            *selected_idx = (*selected_idx - 1 + 3) % 3;
+            // if the selected index is on the first option, go to the submit option
+            if (*selected_idx == 0) *selected_idx = num_options - 2;
+            // if not, just go to the previous option
+            else *selected_idx = (*selected_idx - 1 + num_options) % (num_options);
             break;
         case KEY_DOWN:
-            *selected_idx = (*selected_idx + 1) % 3;
+            *selected_idx = (*selected_idx + 1) % num_options;
             break;
         case 10:  // Enter
             switch (*selected_idx) {
                 case 0:  // priority
                 case 1:  // data
-                    *selected_idx = (*selected_idx + 1) % 3;
+                    *selected_idx = (*selected_idx + 1) % num_options;
                     break;
                 case 2:  // submit
                     // edit the note
@@ -217,6 +232,33 @@ void handle_input_main_window_edit_note(int key, int *selected_idx, int *main_wi
                     }
                     // reset the idx
                     *selected_idx = 0;
+                    break;
+                case 3:  // delete note
+                    // delete the note
+                    notes_list_remove(note_list, *note_id);
+                    // go back to the main window mode 0 (list notes)
+                    *main_window_mode = 0;
+                    *selected_window = 1;
+                    // reset the priority and data
+                    *priority = 0;
+                    // free the data
+                    if (*data != NULL) {
+                        free(*data);
+                        *data = NULL;
+                    }
+                    // reset the idx
+                    *selected_idx = 0;
+                    break;
+            }
+            break;
+        case 113: // q
+            switch (*selected_idx) {
+                case 0:  // priority
+                case 2:  // submit
+                case 3:  // delete note
+                    end_app();
+                    break;
+                default:
                     break;
             }
             break;
@@ -396,8 +438,6 @@ void draw_main_window(WINDOW *main_note_win, NoteList *note_list, int *selected_
     case 1:  // new note
         // print the title
         mvwprintw(main_note_win, 0, 2, " New note ");
-        
-        //print_to_terminal("IDX: %s\n", data);
 
         // priority
         if (*selected_idx == 0 && selected) wattron(main_note_win, A_REVERSE);
@@ -434,6 +474,11 @@ void draw_main_window(WINDOW *main_note_win, NoteList *note_list, int *selected_
         if (*selected_idx == 2 && selected) wattron(main_note_win, A_REVERSE);
         mvwprintw(main_note_win, 3, 2, "Submit");
         if (*selected_idx == 2 && selected) wattroff(main_note_win, A_REVERSE);
+
+        // button to delete the note
+        if (*selected_idx == 3 && selected) wattron(main_note_win, A_REVERSE);
+        mvwprintw(main_note_win, 5, 2, "Delete note");
+        if (*selected_idx == 3 && selected) wattroff(main_note_win, A_REVERSE);
 
         break;
     

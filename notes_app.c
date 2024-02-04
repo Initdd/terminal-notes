@@ -42,6 +42,12 @@
 // Global variables
 volatile sig_atomic_t quit_flag = 0;
 NoteList *note_list;
+
+// utility variables
+int priority = 0;
+char *data = NULL; // will be used to make mallocs/reallocs/frees
+int note_id = 0;
+
 // Windows
 WINDOW *menu_win;
 WINDOW *main_note_win;
@@ -63,6 +69,11 @@ void print_to_terminal(const char* pat, void *msg) {
 void end_app() {
     //notes_list_save(note_list, DATA, DEL);
     notes_list_delete(note_list);
+    // free the data
+    if (data != NULL) {
+        free(data);
+        data = NULL;
+    }
     // close the windows
     delwin(menu_win);
     delwin(main_note_win);
@@ -496,10 +507,6 @@ void draw_main_window(WINDOW *main_note_win, NoteList *note_list, int *selected_
 int main() {
     init_display();
 
-    // utility variables
-    int priority = 0;
-    char *data = NULL; // will be used to make mallocs/reallocs/frees
-    int note_id = 0;
     // selected window (0 - menu, 1 - main window)
     int selected_window = 0;
     // when in main window mode 0, this is the selected item

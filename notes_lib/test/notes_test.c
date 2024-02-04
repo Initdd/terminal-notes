@@ -6,8 +6,9 @@
 #include "../notes.h"
 
 // test flags
-#define TEST_NOTE 0
-#define TEST_NOTELIST 0
+// test types:
+// 0 - Note test, 1 - NoteList test, 2 - NoteList file test, 3 - save and load test
+#define TEST_TYPE 3
 
 // generic variables
 #define FILENAME "test.txt"
@@ -15,7 +16,7 @@
 
 
 int main() {
-    #if(TEST_NOTE)
+    #if(TEST_TYPE == 0)
     // Note test
     // create a new note
     Note *note = notes_create("Hello World!", 1);
@@ -32,8 +33,7 @@ int main() {
     // delete the note
     notes_delete(note);
     #endif
-    #if(TEST_NOTELIST)
-
+    #if(TEST_TYPE == 1)
     // NoteList test
     // create a new note list
     NoteList *list = notes_list_create();
@@ -66,16 +66,14 @@ int main() {
     notes_list_delete(list);
     // check if the list was deleted
     printf("List: %s\n", notes_list_read(list));
-    #else
+    #endif
+    #if(TEST_TYPE == 2)
     // NoteList file test
     // create a new note list
     NoteList *list = notes_list_create();
     // add a note to the list
     notes_list_add(list, notes_create("test1", 1));
     notes_list_add(list, notes_create("test2", 2));
-    notes_list_add(list, notes_create("test3", 3));
-    notes_list_add(list, notes_create("test4", 4));
-    notes_list_add(list, notes_create("test5", 5));
     // save the list to a file
     notes_list_save(list, "test.txt", DEL);
     // delete the list
@@ -86,9 +84,44 @@ int main() {
     char *str1 = notes_list_read(list2);
     printf("List:\n%s\n", str1);
     free(str1);
+    // add a note to the list
+    notes_list_add(list2, notes_create("test3", 3));
+    // update a note from the list
+    notes_list_update(list2, 2, "test3 updated", 4);
+    // print the list
+    char *str2 = notes_list_read(list2);
+    printf("List:\n%s\n", str2);
+    free(str2);
     // delete the list
     notes_list_delete(list2);
     #endif
+    #if(TEST_TYPE == 3) // test for save and load
+    // create a new note list and add some notes
+    NoteList *list = notes_list_create();
+    notes_list_add(list, notes_create("test1", 1));
+    notes_list_add(list, notes_create("test2", 2));
+    // save the list to a file
+    notes_list_save(list, FILENAME, DEL);
+    // delete the list
+    notes_list_delete(list);
+    // load the list from the file
+    NoteList *list2 = notes_list_load(FILENAME, DEL);
+    // print the list
+    char *str1 = notes_list_read(list2);
+    printf("List:\n%s\n", str1);
+    free(str1);
+    // add a note to the list
+    notes_list_add(list2, notes_create("test3", 3));
+    // update a note from the list
+    notes_list_update(list2, 2, "test3 updated", 4);
+    // print the list
+    char *str2 = notes_list_read(list2);
+    printf("List:\n%s\n", str2);
+    free(str2);
+    // delete the list
+    notes_list_delete(list2);
+    #endif
+    return 0;
 }
 
 

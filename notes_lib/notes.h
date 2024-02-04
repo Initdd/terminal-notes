@@ -19,7 +19,7 @@
 */
 
 typedef struct note {
-	int id;         // identifier for the node
+	int id;         // identifier for the note
 	int prt;        // level of priority (1 to 5(most important))
 	char *data;     // data on the note
 } Note;

@@ -1,3 +1,5 @@
+![image](assets/example.png)
+
 # Notes App
 
 ## Overview

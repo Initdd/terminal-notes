@@ -549,9 +549,53 @@ void draw_main_window(WINDOW *main_note_win, NoteList *note_list, int *selected_
     wrefresh(main_note_win);
 }
 
+/**
+ * Arguments:
+ *  -l: list notes
+*/
 
 // Main function
-int main() {
+int main(int argc, char *argv[]) {
+    // Notes
+    note_list = notes_list_load(DATA, DEL);
+    // check if the notes were loaded successfully
+    if (note_list == NULL) {
+        printf("Error: Failed to load the notes: Data file not found\n");
+        return 1;
+    }
+
+    // check if the user wants to list the notes
+    if (argc > 1) {
+        if (strcmp(argv[1], "-l") == 0) {
+            for (int i = 0; i < note_list->size; ++i) {
+                char *color_bgn;
+                char *color_end;
+                switch (note_list->list[i]->prt) {
+                    case 1:
+                        color_bgn = "\033[0;37m";
+                        color_end = "\033[0m";
+                        break;
+                    case 2:
+                        color_bgn = "\033[0;33m";
+                        color_end = "\033[0m";
+                        break;
+                    case 3:
+                        color_bgn = "\033[0;31m";
+                        color_end = "\033[0m";
+                        break;
+                    default:
+                        color_bgn = "\033[0;37m";
+                        color_end = "\033[0m";
+                        break;
+                }
+                printf("%s%d: %s%s\n", color_bgn, note_list->list[i]->prt, note_list->list[i]->data, color_end);
+            }
+            notes_list_delete(note_list);
+            return 0;
+        }
+    }
+    
+    // Initialize the display
     init_display();
 
     // selected window (0 - menu, 1 - main window)
@@ -569,9 +613,6 @@ int main() {
     menu_win = newwin(MENU_WINDOW_HEIGHT, MENU_WINDOW_WIDTH, MARGIN, MARGIN);
     main_note_win = newwin(MAIN_WINDOW_HEIGHT, MAIN_WINDOW_WIDTH, MARGIN, MENU_WINDOW_WIDTH + (MARGIN * 2));
     refresh();
-
-    // Notes
-    note_list = notes_list_load(DATA, DEL);
 
     // Main loop
     while (!quit_flag) {

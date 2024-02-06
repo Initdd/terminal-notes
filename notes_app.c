@@ -21,7 +21,7 @@
 
 // Constants
 // file path for the notes
-#define DATA "/home/Initdd/.bootexec/notes/data_test"
+#define DATA "/home/Initdd/.bootexec/notes/data"
 #define TMP "/home/Initdd/.bootexec/notes/tmp"
 // format of the notes in the file
 #define DEL '-'
@@ -121,9 +121,13 @@ void init_display() {
 void handle_input_main_window_list_notes(int key, int *selected_idx, int *main_window_mode, NoteList *note_list, int *selected_window, int *priority, char **data, int *note_id) {
     switch (key) {
         case KEY_UP:
+            // check if the list is empty
+            if (note_list->size == 0) break;
             *selected_idx = (*selected_idx - 1 + note_list->size) % note_list->size;
             break;
         case KEY_DOWN:
+            // check if the list is empty
+            if (note_list->size == 0) break;
             *selected_idx = (*selected_idx + 1) % note_list->size;
             break;
         case 113: // q

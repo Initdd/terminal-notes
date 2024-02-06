@@ -20,7 +20,7 @@
 
 typedef struct note {
 	int id;         // identifier for the note
-	int prt;        // level of priority (1 to 5(most important))
+	int prt;        // level of priority (0 to 2(most important))
 	char *data;     // data on the note
 } Note;
 
@@ -38,6 +38,13 @@ typedef struct noteList {
 	int capacity;   // maximum number of elements in the array (not user defined)
 } NoteList;
 
+/**
+ * macros for the NoteList
+ */
+
+#define NOTE_LIST_INITIAL_CAPACITY 10
+#define NOTE_PRIORITY_MIN 1
+#define NOTE_PRIORITY_MAX 3
 
 /*
  *  Note Structure managing functions

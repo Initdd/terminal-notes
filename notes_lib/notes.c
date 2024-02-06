@@ -8,7 +8,7 @@
 #include "notes.h"
 
 // local functions
-static int digitNum(int n) {
+static int digitNum(int n) { // returns the number of digits in a number
     if (n < 0) return digitNum(-n);
     if (n < 10) return 1;
     return 1 + digitNum(n / 10);
@@ -16,6 +16,9 @@ static int digitNum(int n) {
 
 // Notes Implementation
 Note *notes_create(char *data, int prt) {
+	// validate the priority and data
+	if (prt < 0 || prt > NOTE_PRIORITY_MAX) return NULL;
+	if (data == NULL) return NULL;
 	// alocate memory for the new note
 	Note *note = (Note *)malloc(sizeof note);
 	// set the note data
@@ -55,7 +58,7 @@ void notes_update(Note *note, char *data, int prt) {
 		strcpy(note->data, data);
 	}
 	// update the note priority if the new priority is not NULL
-	if (prt != 0) {
+	if (prt >= NOTE_PRIORITY_MIN && prt <= NOTE_PRIORITY_MAX) {
 		note->prt = prt;
 	}
 }
@@ -75,10 +78,10 @@ NoteList *notes_list_create() {
 	// alocate memory for the new note list
 	NoteList *list = (NoteList *)malloc(sizeof list);
 	// set the list data
-	list->list = (Note **)malloc(sizeof(Note *) * 10);
+	list->list = (Note **)malloc(sizeof(Note *) * NOTE_LIST_INITIAL_CAPACITY);
 	list->last_id = 0;
 	list->size = 0;
-	list->capacity = 10;
+	list->capacity = NOTE_LIST_INITIAL_CAPACITY;
 	// return the list
 	return list;
 }
@@ -186,6 +189,8 @@ void notes_list_remove(NoteList *list, int id) {
 }
 
 void notes_list_update(NoteList *list, int id, char *data, int prt) {
+	// check if the id is valid
+	if (id < 0) return;
 	// update the note from the list
 	// find the note with the given id
 	int index = -1;
@@ -249,7 +254,12 @@ NoteList *notes_list_load(char *path, char delimiter) {
 	char *format = "%d%c%[^\n]";
 	while (fscanf(file, format, &prt, &delimiter, data) != EOF) {
 		// add the note to the list
-		notes_list_add(list, notes_create(data, prt));
+		// create the note
+		Note *note = notes_create(data, prt);
+		// check if the note was created, if not, continue
+		if (note == NULL) continue;
+		// add the note to the list
+		notes_list_add(list, note);
 	}
 	// close the file
 	fclose(file);

@@ -67,7 +67,7 @@ void print_to_terminal(const char* pat, void *msg) {
 
 // handle signal ctrl c
 void end_app() {
-    //notes_list_save(note_list, DATA, DEL);
+    notes_list_save(note_list, DATA, DEL);
     notes_list_delete(note_list);
     // free the data
     if (data != NULL) {
@@ -96,6 +96,24 @@ void init_display() {
     noecho();
     keypad(stdscr, TRUE);
     curs_set(0);
+    start_color();
+    use_default_colors();
+    // Define color pairs
+    // id, foreground, background
+    // priorities
+    init_pair(1, COLOR_WHITE, -1); // 1
+    init_pair(2, COLOR_YELLOW, -1); // 2
+    init_pair(3, COLOR_RED, -1); // 3
+    init_pair(4, COLOR_BLACK, COLOR_WHITE); // 1 selected
+    init_pair(5, COLOR_BLACK, COLOR_YELLOW); // 2 selected
+    init_pair(6, COLOR_WHITE, COLOR_RED); // 3 selected
+    // buttons
+    init_pair(7, COLOR_WHITE, COLOR_RED); // delete button selected
+    init_pair(8, COLOR_RED, -1); // delete button not selected
+    init_pair(9, COLOR_WHITE, COLOR_GREEN); // submit button selected
+    init_pair(10, COLOR_GREEN, -1); // submit button not selected
+    init_pair(11, COLOR_WHITE, COLOR_RED); // exit button selected
+    init_pair(12, COLOR_RED, -1); // exit button not selected
 }
 
 // Input handling
@@ -149,8 +167,11 @@ void handle_input_main_window_new_note(int key, int *selected_idx, int *main_win
                 case 2:  // submit
                     // create a new note and add it to the list
                     Note *new_note = notes_create(*data, *priority);
-                    // add the note to the list
-                    notes_list_add(note_list, new_note);
+                    // check if the note was created successfully, if not, ignore the note
+                    if (new_note != NULL) {
+                        // add the note to the list
+                        notes_list_add(note_list, new_note);
+                    }
                     // go back to the main window mode 0 (list notes)
                     *main_window_mode = 0;
                     *selected_window = 1;
@@ -407,14 +428,28 @@ void draw_menu_window(WINDOW *menu_win, int selected_option, char *menu_options[
     // Print each menu option
     for (int i = 0; i < option_count; ++i) {
         if (i == selected_option && selected) {
-            wattron(menu_win, A_REVERSE);  // Highlight the selected option
+            // highlight the selected option (red on exit, white on the others)
+            if (i == option_count - 1) wattron(menu_win, COLOR_PAIR(11));
+            else wattron(menu_win, COLOR_PAIR(4));
+        }
+        else {
+            // highlight the not selected option (red on exit, white on the others)
+            if (i == option_count - 1) wattron(menu_win, COLOR_PAIR(12));
+            else wattron(menu_win, COLOR_PAIR(1));
         }
 
         // Print the option at a specific position within the window
         mvwprintw(menu_win, i + 1, 2, menu_options[i]);
 
         if (i == selected_option && selected) {
-            wattroff(menu_win, A_REVERSE);  // Turn off highlighting
+            // turn off highlighting
+            if (i == option_count - 1) wattroff(menu_win, COLOR_PAIR(11));
+            else wattroff(menu_win, COLOR_PAIR(4));
+        }
+        else {
+            // turn off highlighting
+            if (i == option_count - 1) wattroff(menu_win, COLOR_PAIR(12));
+            else wattroff(menu_win, COLOR_PAIR(1));
         }
     }
     wrefresh(menu_win);
@@ -434,7 +469,8 @@ void draw_main_window(WINDOW *main_note_win, NoteList *note_list, int *selected_
         // Print each note
         for (int i = 0; i < note_list->size; ++i) {
             // highlight the selected note
-            if (i == *selected_idx && selected) wattron(main_note_win, A_REVERSE);
+            if (i == *selected_idx && selected) wattron(main_note_win, COLOR_PAIR(note_list->list[i]->prt + NOTE_PRIORITY_MAX));
+            else wattron(main_note_win, COLOR_PAIR(note_list->list[i]->prt));
             // Print the note at a specific position within the window
             // if the note is larger than the window, print only the first part
             if (strlen(note_list->list[i]->data) >= MAIN_WINDOW_WIDTH) {
@@ -443,7 +479,8 @@ void draw_main_window(WINDOW *main_note_win, NoteList *note_list, int *selected_
                 mvwprintw(main_note_win, i + 1, 2, "%s", note_list->list[i]->data);
             }
             // turn off highlighting
-            if (i == *selected_idx && selected) wattroff(main_note_win, A_REVERSE);
+            if (i == *selected_idx && selected) wattroff(main_note_win, COLOR_PAIR(note_list->list[i]->prt + NOTE_PRIORITY_MAX));
+            else wattroff(main_note_win, COLOR_PAIR(note_list->list[i]->prt));
         }
         break;
     case 1:  // new note
@@ -461,9 +498,11 @@ void draw_main_window(WINDOW *main_note_win, NoteList *note_list, int *selected_
         if (*selected_idx == 1 && selected) wattroff(main_note_win, A_REVERSE);
 
         // submit
-        if (*selected_idx == 2 && selected) wattron(main_note_win, A_REVERSE);
+        if (*selected_idx == 2 && selected) wattron(main_note_win, COLOR_PAIR(9));
+        else wattron(main_note_win, COLOR_PAIR(10));
         mvwprintw(main_note_win, 3, 2, "Submit");
-        if (*selected_idx == 2 && selected) wattroff(main_note_win, A_REVERSE);
+        if (*selected_idx == 2 && selected) wattroff(main_note_win, COLOR_PAIR(9));
+        else wattroff(main_note_win, COLOR_PAIR(10));
         
         break;
 
@@ -482,14 +521,18 @@ void draw_main_window(WINDOW *main_note_win, NoteList *note_list, int *selected_
         if (*selected_idx == 1 && selected) wattroff(main_note_win, A_REVERSE);
 
         // submit
-        if (*selected_idx == 2 && selected) wattron(main_note_win, A_REVERSE);
+        if (*selected_idx == 2 && selected) wattron(main_note_win, COLOR_PAIR(9));
+        else wattron(main_note_win, COLOR_PAIR(10));
         mvwprintw(main_note_win, 3, 2, "Submit");
-        if (*selected_idx == 2 && selected) wattroff(main_note_win, A_REVERSE);
+        if (*selected_idx == 2 && selected) wattroff(main_note_win, COLOR_PAIR(9));
+        else wattroff(main_note_win, COLOR_PAIR(10));
 
         // button to delete the note
-        if (*selected_idx == 3 && selected) wattron(main_note_win, A_REVERSE);
+        if (*selected_idx == 3 && selected) wattron(main_note_win, COLOR_PAIR(7));
+        else wattron(main_note_win, COLOR_PAIR(8));
         mvwprintw(main_note_win, 5, 2, "Delete note");
-        if (*selected_idx == 3 && selected) wattroff(main_note_win, A_REVERSE);
+        if (*selected_idx == 3 && selected) wattroff(main_note_win, COLOR_PAIR(7));
+        else wattroff(main_note_win, COLOR_PAIR(8));
 
         break;
     

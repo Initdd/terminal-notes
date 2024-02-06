@@ -246,6 +246,8 @@ NoteList *notes_list_load(char *path, char delimiter) {
 	// load the list from the file
 	// open the file
 	FILE *file = fopen(path, "r");
+	// check if the file exists
+	if (file == NULL) return NULL;
 	// create a new list
 	NoteList *list = notes_list_create();
 	// read the file

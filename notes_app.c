@@ -21,8 +21,7 @@
 
 // Constants
 // file path for the notes
-#define DATA "/home/Initdd/.bootexec/notes/data"
-#define TMP "/home/Initdd/.bootexec/notes/tmp"
+#define DATA "./data"
 // format of the notes in the file
 #define DEL '-'
 
@@ -384,7 +383,7 @@ void handle_input_menu(int key, int *selected_option, int option_count, int *sel
                     // start by allocating memory for the data (if not already allocated)
                     if (*data == NULL) *data = (char *)malloc(sizeof(char) * 256);
                     // set default values for the priority and data
-                    *priority = 0;
+                    *priority = 1;
                     strcpy(*data, "");
                     break;
                 case 2:  // exit

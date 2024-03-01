@@ -1,6 +1,6 @@
 options = -Wall -g
 app = notes_app
-lib = notes_lib
+lib = notes
 notes = ./$(lib)/notes.c
 
 all: $(app).o $(lib).o

@@ -17,7 +17,7 @@
 #include <signal.h>
 
 // Local libraries
-#include "./notes_lib/notes.h"
+#include "./notes/notes.h"
 
 // Constants
 // file path for the notes

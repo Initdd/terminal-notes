@@ -22,8 +22,8 @@ typedef struct note {
 	int id;         // identifier for the note
 	int prt;        // level of priority (0 to 2(most important))
 	char *data;     // data on the note
+	char *group;    // group of the note
 } Note;
-
 
 /*
  *  Note List Data Structure

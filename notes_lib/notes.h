@@ -1,5 +1,5 @@
 
-/**
+/*
  *  Notes Managing Tools
  *
  *  Includes:
@@ -11,9 +11,9 @@
  * 
  *  Author: Initdd
  *  Version: 0.1
- */
+*/
 
-/**
+/*
  * Note Data Structure
  * 
 */
@@ -25,11 +25,11 @@ typedef struct note {
 } Note;
 
 
-/**
+/*
  *  Note List Data Structure
  * 
  *  An Array of Note pointers
- */
+*/
 
 typedef struct noteList {
 	Note **list;    // array of Note pointers
@@ -38,9 +38,9 @@ typedef struct noteList {
 	int capacity;   // maximum number of elements in the array (not user defined)
 } NoteList;
 
-/**
+/*
  * macros for the NoteList
- */
+*/
 
 #define NOTE_LIST_INITIAL_CAPACITY 10
 #define NOTE_PRIORITY_MIN 1
@@ -50,7 +50,7 @@ typedef struct noteList {
  *  Note Structure managing functions
  *
  *  Following the CRUD principle
- */
+*/
 
 // create a new Note object with the specified atributes (data and priority)
 Note *notes_create(char *data, int prt);
@@ -62,9 +62,9 @@ void notes_update(Note *note, char *data, int prt);
 void notes_delete(Note *note);
 
 
-/**
+/*
  *  Notes List specific utilities
- */
+*/
 
 // create a new NoteList object
 NoteList *notes_list_create();
@@ -84,11 +84,11 @@ void notes_list_delete(NoteList *list);
 void notes_list_foreach(NoteList *list, void (*func)(Note *));
 
 
-/**
+/*
  *  File Specific Utilities
  *  
  *  Related to Notes
- */
+*/
 
 // load a list of Notes from a formated (with save) file
 NoteList *notes_list_load(char *filename, char delimiter);

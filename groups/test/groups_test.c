@@ -38,7 +38,7 @@ void test_group_add_item() {
     Group *group = group_create("Test Group");
     // Add an item to the group
     int *item = (int *)malloc(sizeof item);
-    *item = 1;
+    *item = TEST_VALUE;
     group_add_item(group, item);
     // Verify that the item has been added
     assert(group->size == 1);
@@ -53,13 +53,13 @@ void test_group_remove_item() {
     Group *group = group_create("Test Group");
     // Add some items to the group
     int *item = (int *)malloc(sizeof item);
-    *item = 1;
+    *item = TEST_VALUE;
     group_add_item(group, item);
     item = (int *)malloc(sizeof item);
-    *item = 2;
+    *item = TEST_VALUE;
     group_add_item(group, item);
     item = (int *)malloc(sizeof item);
-    *item = 3;
+    *item = TEST_VALUE;
     group_add_item(group, item);
     // Remove an item from the group using the remove_item function
     // group, int compare function, item delete function
@@ -88,7 +88,7 @@ void test_group_delete() {
     int group_address = (long)group;
     // Add an item to the group
     int *item = (int *)malloc(sizeof item);
-    *item = 1;
+    *item = TEST_VALUE;
     group_add_item(group, item);
     // Delete the group
     group_delete(group, int_item_delete);

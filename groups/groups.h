@@ -1,18 +1,52 @@
 
+/*
+ *  Groups Management Tools
+ *
+ *  Includes:
+ *
+ *  - Group Data Structure
+ *  - Group Management Functions
+ * 
+ *  Author: Initdd
+*/
+
+/**
+ * Groups Constants
+*/
+
+#define GROUPS_INITIAL_CAPACITY 10
+
+/*
+ * Group Data Structure
+ * 
+ * A group is a collection of data.
+ * It is identified by a name.
+ * 
+*/
+
 typedef struct group {
-    char *name;         // name of the group
-    void *list;    // list of notes in the group
+    char *name;     // name of the group
+	void **list;    // array of Note pointers
+	int size;       // number of elements in the array
+	int capacity;   // maximum number of elements in the array (not user defined)
 } Group;
 
-// Create a new group
-Group* createGroup(const char* name);
+/*
+ * Group Management Functions
+*/
 
-// Add a note to a group
-void addNoteToGroup(Group* group, void* note);
+// Create a new group with a specified name
+Group *group_create(const char *name);
 
-// Remove a note from a group
-void removeNoteFromGroup(Group* group, void* note);
+// Add a item to a group
+void group_add_item(Group *group, void *item);
+
+// Remove a item from a group
+void group_remove_item(Group *group, int *(checker)(void *item), void *(deleter)(void *item));
+
+// Update a group name
+void group_update_name(Group *group, const char *name);
 
 // Delete a group
-void deleteGroup(Group* group);
+void group_delete(Group *group, void *(deleter)(void *item));
 

@@ -42,11 +42,11 @@ Group *group_create(const char *name);
 void group_add_item(Group *group, void *item);
 
 // Remove a item from a group
-void group_remove_item(Group *group, int *(checker)(void *item), void *(deleter)(void *item));
+void group_remove_item(Group *group, int (*checker)(void *item), void (*deleter)(void *item));
 
 // Update a group name
 void group_update_name(Group *group, const char *name);
 
 // Delete a group
-void group_delete(Group *group, void *(deleter)(void *item));
+void group_delete(Group *group, void (*deleter)(void *item));
 

@@ -39,7 +39,7 @@ void group_add_item(Group *group, void *item) {
 }
 
 // Remove a item from a group by a given checker function
-void group_remove_item(Group *group, int *(checker)(void *item), void *(deleter)(void *item)) {
+void group_remove_item(Group *group, int (*checker)(void *item), void (*deleter)(void *item)) {
 	// remove the item from the list
 	// find the item index in the list
 	int index = -1;
@@ -77,7 +77,7 @@ void group_update_name(Group *group, const char *name) {
 }
 
 // Delete a group and all its items
-void group_delete(Group *group, void *(deleter)(void *item)) {
+void group_delete(Group *group, void (*deleter)(void *item)) {
 	// delete the group
 	// delete all the items
 	for (int i = 0; i < group->size; i++) {

@@ -14,8 +14,8 @@ int int_item_compare(void *a) {
 }
 
 void int_item_delete(void *a) {
-    // Nothing to do here
-    return;
+    // Free the memory allocated for the item
+    free((int*)a);
 }
 
 void test_group_create() {
@@ -37,27 +37,30 @@ void test_group_add_item() {
     // Create the group
     Group *group = group_create("Test Group");
     // Add an item to the group
-    int item = 1;
-    group_add_item(group, &item);
+    int *item = (int *)malloc(sizeof item);
+    *item = 1;
+    group_add_item(group, item);
     // Verify that the item has been added
     assert(group->size == 1);
     // Verify that the item has been added to the list
-    assert(group->list[0] == &item);
+    assert(group->list[0] == item);
     // Remove the group
     group_delete(group, int_item_delete);
 }
 
 void test_group_remove_item() {
     // Create the group
-    Group *group = (Group *)malloc(sizeof group);
-    group = group_create("Test Group");
+    Group *group = group_create("Test Group");
     // Add some items to the group
-    int item = 1;
-    group_add_item(group, &item);
-    int item2 = 2;
-    group_add_item(group, &item2);
-    int item3 = 3;
-    group_add_item(group, &item3);
+    int *item = (int *)malloc(sizeof item);
+    *item = 1;
+    group_add_item(group, item);
+    item = (int *)malloc(sizeof item);
+    *item = 2;
+    group_add_item(group, item);
+    item = (int *)malloc(sizeof item);
+    *item = 3;
+    group_add_item(group, item);
     // Remove an item from the group using the remove_item function
     // group, int compare function, item delete function
     group_remove_item(group, int_item_compare, int_item_delete);
@@ -84,8 +87,9 @@ void test_group_delete() {
     // Save the address of the group
     int group_address = (long)group;
     // Add an item to the group
-    int item = 1;
-    group_add_item(group, &item);
+    int *item = (int *)malloc(sizeof item);
+    *item = 1;
+    group_add_item(group, item);
     // Delete the group
     group_delete(group, int_item_delete);
     // Verify that the group has been deleted

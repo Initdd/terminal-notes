@@ -16,5 +16,5 @@ $(TEST_FILE).o: $(TEST_FILE).c
 	gcc -c $(TEST_FILE).c $(ARGS)
 
 clean:
-	rm -f $(GROUPS_FILE).o $(TEST_FILE).o $(TEST_FILE)
+	rm -f $(GROUPS_FILE).o $(TEST_FILE).o $(TEST_FILE) vgcore.*
 

@@ -10,7 +10,6 @@
  *  - File specific utilities to save and retreive Notes list
  * 
  *  Author: Initdd
- *  Version: 0.1
 */
 
 /*

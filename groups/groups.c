@@ -1,6 +1,7 @@
 
 // general includes
-#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 // local includes
 #include "groups.h"
 
@@ -18,6 +19,11 @@ Group *group_create(const char *name) {
     group->name = (char *)malloc(sizeof(char) * (strlen(name) + 1));
     // copy the name to the group
     strcpy(group->name, name);
+	// set the group size and capacity
+	group->size = 0;
+	group->capacity = GROUPS_INITIAL_CAPACITY;
+	// allocate memory for the list
+	group->list = (void **)malloc(sizeof(void *) * group->capacity);
     // return the group
     return group;
 }
@@ -30,7 +36,7 @@ void group_add_item(Group *group, void *item) {
 		// if it is, double the capacity
 		group->capacity *= 2;
 		// realocate memory for the list
-		group->list = (Group **)realloc(group->list, sizeof(Group *) *group->capacity);
+		group->list = (void **)realloc(group->list, sizeof(void *) *group->capacity);
 	}
 	// add the item to the list
 	group->list[group->size] = item;

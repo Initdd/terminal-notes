@@ -26,7 +26,7 @@
 
 typedef struct group {
     char *name;     // name of the group
-	void **list;    // array of Note pointers
+	void **list;    // array of data pointers
 	int size;       // number of elements in the array
 	int capacity;   // maximum number of elements in the array (not user defined)
 } Group;

@@ -4,13 +4,13 @@
 #include <assert.h>
 #include <string.h>
 // local includes
-#include "../groups.h"
+#include "../group.h"
 
 // Constants
 #define TEST_VALUE 1
 
-int int_item_compare(void *a) {
-    return *(int*)a - TEST_VALUE;
+int int_item_compare(void *a, void *b) {
+    return *(int*)a - *(int*)b;
 }
 
 void int_item_delete(void *a) {
@@ -63,7 +63,7 @@ void test_group_remove_item() {
     group_add_item(group, item);
     // Remove an item from the group using the remove_item function
     // group, int compare function, item delete function
-    group_remove_item(group, int_item_compare, int_item_delete);
+    group_remove_item(group, int_item_delete, &item, int_item_compare);
     // Verify that the item has been removed
     assert(group->size == 2);
     // Remove the group

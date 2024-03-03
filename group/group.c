@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 // local includes
-#include "groups.h"
+#include "group.h"
 
 // local functions
 // ? no for now
@@ -21,7 +21,7 @@ Group *group_create(const char *name) {
     strcpy(group->name, name);
 	// set the group size and capacity
 	group->size = 0;
-	group->capacity = GROUPS_INITIAL_CAPACITY;
+	group->capacity = GROUP_INITIAL_CAPACITY;
 	// allocate memory for the list
 	group->list = (void **)malloc(sizeof(void *) * group->capacity);
     // return the group
@@ -45,12 +45,12 @@ void group_add_item(Group *group, void *item) {
 }
 
 // Remove a item from a group by a given checker function
-void group_remove_item(Group *group, int (*checker)(void *item), void (*deleter)(void *item)) {
+void group_remove_item(Group *group, void (*deleter)(void *item), void *item, int (*cmp)(void *a, void *b)) {
 	// remove the item from the list
 	// find the item index in the list
 	int index = -1;
 	for (int i = 0; i < group->size; i++) {
-		if (checker(group->list[i])) {
+		if (cmp(group->list[i], item)) {
 			index = i;
 			break;
 		}

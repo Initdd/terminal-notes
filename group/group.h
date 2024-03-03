@@ -1,6 +1,6 @@
 
 /*
- *  Groups Management Tools
+ *  Group Management Tools
  *
  *  Includes:
  *
@@ -11,10 +11,10 @@
 */
 
 /**
- * Groups Constants
+ * Group Constants
 */
 
-#define GROUPS_INITIAL_CAPACITY 10
+#define GROUP_INITIAL_CAPACITY 10
 
 /*
  * Group Data Structure
@@ -42,7 +42,7 @@ Group *group_create(const char *name);
 void group_add_item(Group *group, void *item);
 
 // Remove a item from a group
-void group_remove_item(Group *group, int (*checker)(void *item), void (*deleter)(void *item));
+void group_remove_item(Group *group, void (*deleter)(void *item), void *item, int (*cmp)(void *a, void *b));
 
 // Update a group name
 void group_update_name(Group *group, const char *name);

@@ -1,6 +1,6 @@
 
-TEST_FILE = groups_test
-GROUPS_FILE = groups
+TEST_FILE = group_test
+GROUPS_FILE = group
 GROUPS_FILE_FULL_PATH = ../$(GROUPS_FILE)
 
 ARGS = -Wall -g

@@ -6,12 +6,21 @@
 
 // Local includes
 #include "notes.h"
+#include "../group/group.h"
 
 // local functions
 static int digitNum(int n) { // returns the number of digits in a number
     if (n < 0) return digitNum(-n);
     if (n < 10) return 1;
     return 1 + digitNum(n / 10);
+}
+
+void notes_group_deleter(void *item) {
+    notes_delete((Note *)item);
+}
+
+int notes_compare_id(void *a, void *b) {
+    return ((Note *)a)->id == ((Note *)b)->id;
 }
 
 // Notes Implementation
@@ -267,4 +276,30 @@ NoteList *notes_list_load(char *path, char delimiter) {
 	fclose(file);
 	// return the list
 	return list;
+}
+
+// Notes Groups
+// Create a new group with a specified name
+Group *notes_group_create(const char *name) {
+    return group_create(name);
+}
+
+// Add a item to a group
+void notes_group_add_item(Group *group, Note *item) {
+    group_add_item(group, item);
+}
+
+// Remove a item from a group
+void notes_group_remove_item(Group *group, int id) {
+    group_remove_item(group, notes_group_deleter, &id, notes_compare_id);
+}
+
+// Update a group name
+void notes_group_update_name(Group *group, const char *name) {
+    group_update_name(group, name);
+}
+
+// Delete a group
+void notes_group_delete(Group *group, Note (*deleter)(Note *item)) {
+    group_delete(group, notes_group_deleter);
 }

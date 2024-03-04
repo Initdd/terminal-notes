@@ -28,6 +28,31 @@ Group *group_create(const char *name) {
     return group;
 }
 
+// Read a group into a string
+char *group_read(Group *group, char delimiter) {
+	// alocate memory for the string
+	// calculate the size of the string
+	int size = strlen(group->name) + group->size;
+	// allocate memory for the string
+	char *str = (char *)malloc(sizeof(char) * (size + 1));
+	// copy the group name to the string
+	strcpy(str, group->name);
+	// add the delimiter to the string
+	str[strlen(group->name)] = delimiter;
+	// add the group list to the string
+	int index = strlen(group->name) + 1;
+	for (int i = 0; i < group->size; i++) {
+		// copy the item to the string
+		strcpy(str + index, group->list[i]);
+		// add the delimiter to the string
+		str[index + strlen(group->list[i])] = delimiter;
+		// update the index
+		index += strlen(group->list[i]) + 1;
+	}
+	// return the string
+	return str;
+}
+
 // add the item to the group list of data
 void group_add_item(Group *group, void *item) {
 	// add the item to the list

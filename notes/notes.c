@@ -300,6 +300,6 @@ void notes_group_update_name(Group *group, const char *name) {
 }
 
 // Delete a group
-void notes_group_delete(Group *group, Note (*deleter)(Note *item)) {
+void notes_group_delete(Group *group) {
     group_delete(group, notes_group_deleter);
 }

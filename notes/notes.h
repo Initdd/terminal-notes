@@ -114,5 +114,5 @@ void notes_group_remove_item(Group *group, int id);
 // Update a group name
 void notes_group_update_name(Group *group, const char *name);
 // Delete a group
-void notes_group_delete(Group *group, Note (*deleter)(Note *item));
+void notes_group_delete(Group *group);
 

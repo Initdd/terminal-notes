@@ -14,7 +14,12 @@ static int digitNum(int n) { // returns the number of digits in a number
     return 1 + digitNum(n / 10);
 }
 
-// Notes Implementation
+/*
+ * Note Structure managing functions
+ * 
+ * Following the CRUD principle
+*/
+
 Note *notes_create(char *data, int prt) {
 	// validate the priority and data
 	if (prt < 0 || prt > NOTE_PRIORITY_MAX) return NULL;
@@ -72,7 +77,12 @@ void notes_delete(Note *note) {
 	note = NULL;
 }
 
-// Notes List Implementation
+/*
+ * Notes List Implementation
+ * 
+ * Functions to manage a list of notes
+*/
+
 NoteList *notes_list_create() {
 	// create a new NoteList object with a min capacity of 10
 	// alocate memory for the new note list
@@ -229,7 +239,13 @@ void notes_list_foreach(NoteList *list, void (*func)(Note *)) {
 	}
 }
 
-// File Management
+/**
+ * File Management Tools for Notes
+ * 
+ * Save and load notes from a file
+*/
+
+// Save the list to the file
 void notes_list_save(NoteList *list, char *path, char delimiter) {
 	// save the list to the file
 	// open the file
@@ -242,6 +258,7 @@ void notes_list_save(NoteList *list, char *path, char delimiter) {
 	fclose(file);
 }
 
+// Load a list of notes from a file
 NoteList *notes_list_load(char *path, char delimiter) {
 	// load the list from the file
 	// open the file

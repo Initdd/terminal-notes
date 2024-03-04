@@ -325,3 +325,4 @@ void notes_group_update_name(Group *group, const char *name) {
 void notes_group_delete(Group *group) {
     group_delete(group, notes_group_deleter);
 }
+

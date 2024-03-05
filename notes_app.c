@@ -169,7 +169,7 @@ void handle_input_main_window_new_note(int key, int *selected_idx, int *main_win
                     break;
                 case 2:  // submit
                     // create a new note and add it to the list
-                    Note *new_note = notes_create(*data, *priority);
+                    Note *new_note = notes_create(*data, *priority, NULL); // TODO: deal with the groups
                     // check if the note was created successfully, if not, ignore the note
                     if (new_note != NULL) {
                         // add the note to the list
@@ -253,8 +253,8 @@ void handle_input_main_window_edit_note(int key, int *selected_idx, int *main_wi
                 case 2:  // submit
                     // edit the note
                     // update the note
-                    Note *note = notes_list_get(note_list, *note_id);
-                    notes_update(note, *data, *priority);
+                    Note *note = notes_list_get_by_id(note_list, *note_id);
+                    notes_update(note, *data, *priority, NULL); // TODO: deal with the groups
                     // go back to the main window mode 0 (list notes)
                     *main_window_mode = 0;
                     *selected_window = 1;

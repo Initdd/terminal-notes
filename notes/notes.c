@@ -20,7 +20,7 @@ static int digitNum(int n) { // returns the number of digits in a number
  * Following the CRUD principle
 */
 
-Note *notes_create(char *data, int prt) {
+Note *notes_create(char *data, int prt, char *group) {
 	// validate the priority and data
 	if (prt < 0 || prt > NOTE_PRIORITY_MAX) return NULL;
 	if (data == NULL) return NULL;
@@ -35,23 +35,38 @@ Note *notes_create(char *data, int prt) {
 	note->prt = prt;
 	// set the id
 	note->id = 0;
+	// set the group
+	// allocate memory for the group
+	note->group = (char *)malloc(sizeof(char) * (strlen(group) + 1));
+	// copy the group to the note
+	if (group == NULL)
+		note->group = NOTE_GROUP_DEFAULT;
+	else
+		strcpy(note->group, group);
 	// return the note
 	return note;
 }
 
-char *notes_read(Note *note, char sepator) {
+char *notes_read(Note *note, char separator) {
 	// alocate memory acording to the note data size, priority and id
 	// calculate the size of the id string knowing that the id is an integer that can have more than 1 digit
 	int id_size = digitNum(note->id);
-	// aloocate memory for the string in the format: id + separator + priority + separator + data
-	char *str = (char *)malloc(sizeof(char) * (id_size + 1 + 1 + 1 + strlen(note->data) + 1));
+	int sep_size = 1;
+	int priority_size = 1;
+	int data_size = strlen(note->data);
+	int group_size = strlen(note->group);
+	// calculate the size of the resulting string
+	// in the format: id:priority:group:data
+	int size = id_size + sep_size + priority_size + sep_size + group_size + sep_size + data_size + 1;
+	// aloocate memory for the resulting string
+	char *str = (char *)malloc(sizeof(char) * (size));
 	// convert the note to a string and save it in the given string pointer
-	sprintf(str, "%d%c%d%c%s", note->id, sepator, note->prt, sepator, note->data);
+	sprintf(str, "%d%c%d%c%s%c%s", note->id, separator, note->prt, separator, note->group, separator, note->data);
 	// return the string
 	return str;
 }
 
-void notes_update(Note *note, char *data, int prt) {
+void notes_update(Note *note, char *data, int prt, char *group) {
 	// update the note data if the new data is not NULL
 	if (data != NULL) {
 		// free the old data
@@ -66,12 +81,25 @@ void notes_update(Note *note, char *data, int prt) {
 	if (prt >= NOTE_PRIORITY_MIN && prt <= NOTE_PRIORITY_MAX) {
 		note->prt = prt;
 	}
+	// update the note group if the new group is not NULL
+	if (group != NULL) {
+		// free the old group
+		free(note->group);
+		note->group = NULL;
+		// allocate memory for the new group
+		note->group = (char *)malloc(sizeof(char) * (strlen(group) + 1));
+		// copy the group to the note
+		strcpy(note->group, group);
+	}
 }
 
 void notes_delete(Note *note) {
 	// free the note data
 	free(note->data);
 	note->data = NULL;
+	// free the group data
+	free(note->group);
+	note->group = NULL;
 	// free the note
 	free(note);
 	note = NULL;
@@ -141,7 +169,7 @@ char *notes_list_read(NoteList *list) {
     return str;
 }
 
-Note *notes_list_get(NoteList *list, int id) {
+Note *notes_list_get_by_id(NoteList *list, int id) {
 	// get the note from the list
 	// find the note
 	int index = -1;
@@ -155,6 +183,30 @@ Note *notes_list_get(NoteList *list, int id) {
 	if (index == -1) return NULL;
 	// return the note
 	return list->list[index];
+}
+
+Note *notes_list_get_by_idx(NoteList *list, int index) {
+	// get the note from the list by its index
+	// check if the index is valid
+	if (index < 0 || index >= list->size) return NULL;
+	// return the note
+	return list->list[index];
+}
+
+NoteList *notes_list_get_all_by_group(NoteList *list, char *group) {
+	// get all the notes from the list by their group
+	// create a new list
+	NoteList *new_list = notes_list_create();
+	// iterate through the list
+	for (int i = 0; i < list->size; i++) {
+		// check if the note has the same group
+		if (strcmp(list->list[i]->group, group) == 0) {
+			// add the note to the new list
+			notes_list_add(new_list, list->list[i]);
+		}
+	}
+	// return the new list
+	return new_list;
 }
 
 void notes_list_add(NoteList *list, Note *note) {
@@ -198,7 +250,7 @@ void notes_list_remove(NoteList *list, int id) {
 	list->size--;
 }
 
-void notes_list_update(NoteList *list, int id, char *data, int prt) {
+void notes_list_update(NoteList *list, int id, char *data, int prt, char *group) {
 	// check if the id is valid
 	if (id < 0) return;
 	// update the note from the list
@@ -213,7 +265,7 @@ void notes_list_update(NoteList *list, int id, char *data, int prt) {
 	// if the note was not found, return
 	if (index == -1) return;
 	// update the note
-	notes_update(list->list[index], data, prt);
+	notes_update(list->list[index], data, prt, group);
 }
 
 void notes_list_delete(NoteList *list) {
@@ -252,7 +304,9 @@ void notes_list_save(NoteList *list, char *path, char delimiter) {
 	FILE *file = fopen(path, "w");
 	// write the list to the file
 	for (int i = 0; i < list->size; i++) {
-		fprintf(file, "%d%c%s\n", list->list[i]->prt, delimiter, list->list[i]->data);
+		// write the note to the file
+		// format: priority:group:data
+		fprintf(file, "%d%c%s%c%s\n", list->list[i]->prt, delimiter, list->list[i]->group, ' ', list->list[i]->data);
 	}
 	// close the file
 	fclose(file);
@@ -269,12 +323,13 @@ NoteList *notes_list_load(char *path, char delimiter) {
 	NoteList *list = notes_list_create();
 	// read the file
 	int prt;
+	char group[255];
 	char data[255];
-	char *format = "%d%c%[^\n]";
-	while (fscanf(file, format, &prt, &delimiter, data) != EOF) {
+	char *format = "%d%c%[^ ]%c%[^\n]"; // TODO: check format on file
+	while (fscanf(file, format, &prt, &delimiter, group, &delimiter, data) != EOF) {
 		// add the note to the list
 		// create the note
-		Note *note = notes_create(data, prt);
+		Note *note = notes_create(data, prt, group);
 		// check if the note was created, if not, continue
 		if (note == NULL) continue;
 		// add the note to the list

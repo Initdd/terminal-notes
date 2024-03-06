@@ -36,13 +36,9 @@ Note *notes_create(char *data, int prt, char *group) {
 	// set the id
 	note->id = 0;
 	// set the group
-	// allocate memory for the group
-	note->group = (char *)malloc(sizeof(char) * (strlen(group) + 1));
-	// copy the group to the note
-	if (group == NULL)
-		note->group = NOTE_GROUP_DEFAULT;
-	else
-		strcpy(note->group, group);
+	char *group_str = (group == NULL) ? NOTE_GROUP_DEFAULT : group;
+	note->group = (char *)malloc(sizeof(char) * (strlen(group_str) + 1));
+	strcpy(note->group, group_str);
 	// return the note
 	return note;
 }

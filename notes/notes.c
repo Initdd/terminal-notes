@@ -205,6 +205,34 @@ NoteList *notes_list_get_all_by_group(NoteList *list, char *group) {
 	return new_list;
 }
 
+char **notes_list_get_groups(NoteList *list) {
+	// get all the groups from the list
+	// create a new list
+	char **groups = (char **)malloc(sizeof(char *) * list->size);
+	// iterate through the list
+	int size = 0;
+	for (int i = 0; i < list->size; i++) {
+		// check if the group is already in the list
+		int found = 0;
+		for (int j = 0; j < size; j++) {
+			if (strcmp(groups[j], list->list[i]->group) == 0) {
+				found = 1;
+				break;
+			}
+		}
+		// if the group was not found, add it to the list
+		if (!found) {
+			groups[size] = (char *)malloc(sizeof(char) * (strlen(list->list[i]->group) + 1));
+			strcpy(groups[size], list->list[i]->group);
+			size++;
+		}
+	}
+	// realocate memory for the list
+	groups = (char **)realloc(groups, sizeof(char *) * size);
+	// return the list
+	return groups;
+}
+
 void notes_list_add(NoteList *list, Note *note) {
 	// add the note to the list
 	// check if the list is full

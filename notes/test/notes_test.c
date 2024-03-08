@@ -137,6 +137,23 @@ void test_notes_list_get_all_by_group() {
     notes_list_delete(list);
 }
 
+void test_notes_list_get_groups() {
+    // create a new note list
+    NoteList *list = notes_list_create();
+    // add a note to the list
+    notes_list_add(list, notes_create("Hello World!", 1, "test"));
+    // get a note from the list
+    char **groups = notes_list_get_groups(list);
+    // check if the note was gotten
+    assert(groups != NULL);
+    assert(strcmp(groups[0], "test") == 0);
+    assert(groups[1] == NULL);
+    // delete the list
+    notes_list_delete(list);
+    // free the groups
+    free(groups);
+}
+
 void test_notes_list_update() {
     // create a new note list
     NoteList *list = notes_list_create();
@@ -250,6 +267,7 @@ int main() {
     test_notes_list_get_by_id();
     test_notes_list_get_by_idx();
     test_notes_list_get_all_by_group();
+    test_notes_list_get_groups();
     test_notes_list_update();
     test_notes_list_remove();
     test_notes_list_read();
@@ -262,5 +280,4 @@ int main() {
     // return success
     return 0;
 }
-
 

@@ -132,6 +132,13 @@ Note *notes_list_get_by_idx(NoteList *list, int index);
 */
 NoteList *notes_list_get_all_by_group(NoteList *list, char *group);
 /**
+ * @brief Get all groups from the NoteList
+ * @param list the NoteList object
+ * @return a list of strings with the groups
+ * @note the list must be freed after use
+*/
+char **notes_list_get_groups(NoteList *list);
+/**
  * @brief Add a Note to the NoteList
  * @param list the NoteList object
  * @param note the Note object to be added

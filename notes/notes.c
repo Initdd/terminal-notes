@@ -67,7 +67,6 @@ void notes_update(Note *note, char *data, int prt, char *group) {
 	if (data != NULL) {
 		// free the old data
 		free(note->data);
-		note->data = NULL;
 		// allocate memory for the new data
 		note->data = (char *)malloc(sizeof(char) * (strlen(data) + 1));
 		// copy the data to the note
@@ -205,13 +204,14 @@ NoteList *notes_list_get_all_by_group(NoteList *list, char *group) {
 	return new_list;
 }
 
-char **notes_list_get_groups(NoteList *list) {
+char **notes_list_get_groups(NoteList *list, int *list_size) {
 	// get all the groups from the list
 	// create a new list
 	char **groups = (char **)malloc(sizeof(char *) * list->size);
 	// iterate through the list
 	int size = 0;
 	for (int i = 0; i < list->size; i++) {
+		//printf("%s\n", list->list[i]->group);
 		// check if the group is already in the list
 		int found = 0;
 		for (int j = 0; j < size; j++) {
@@ -229,6 +229,8 @@ char **notes_list_get_groups(NoteList *list) {
 	}
 	// realocate memory for the list
 	groups = (char **)realloc(groups, sizeof(char *) * size);
+	// set the list size
+	*list_size = size;
 	// return the list
 	return groups;
 }

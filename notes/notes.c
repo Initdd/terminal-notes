@@ -36,13 +36,9 @@ Note *notes_create(char *data, int prt, char *group) {
 	// set the id
 	note->id = 0;
 	// set the group
-	// allocate memory for the group
-	note->group = (char *)malloc(sizeof(char) * (strlen(group) + 1));
-	// copy the group to the note
-	if (group == NULL)
-		note->group = NOTE_GROUP_DEFAULT;
-	else
-		strcpy(note->group, group);
+	char *group_str = (group == NULL) ? NOTE_GROUP_DEFAULT : group;
+	note->group = (char *)malloc(sizeof(char) * (strlen(group_str) + 1));
+	strcpy(note->group, group_str);
 	// return the note
 	return note;
 }
@@ -71,7 +67,6 @@ void notes_update(Note *note, char *data, int prt, char *group) {
 	if (data != NULL) {
 		// free the old data
 		free(note->data);
-		note->data = NULL;
 		// allocate memory for the new data
 		note->data = (char *)malloc(sizeof(char) * (strlen(data) + 1));
 		// copy the data to the note
@@ -207,6 +202,37 @@ NoteList *notes_list_get_all_by_group(NoteList *list, char *group) {
 	}
 	// return the new list
 	return new_list;
+}
+
+char **notes_list_get_groups(NoteList *list, int *list_size) {
+	// get all the groups from the list
+	// create a new list
+	char **groups = (char **)malloc(sizeof(char *) * list->size);
+	// iterate through the list
+	int size = 0;
+	for (int i = 0; i < list->size; i++) {
+		//printf("%s\n", list->list[i]->group);
+		// check if the group is already in the list
+		int found = 0;
+		for (int j = 0; j < size; j++) {
+			if (strcmp(groups[j], list->list[i]->group) == 0) {
+				found = 1;
+				break;
+			}
+		}
+		// if the group was not found, add it to the list
+		if (!found) {
+			groups[size] = (char *)malloc(sizeof(char) * (strlen(list->list[i]->group) + 1));
+			strcpy(groups[size], list->list[i]->group);
+			size++;
+		}
+	}
+	// realocate memory for the list
+	groups = (char **)realloc(groups, sizeof(char *) * size);
+	// set the list size
+	*list_size = size;
+	// return the list
+	return groups;
 }
 
 void notes_list_add(NoteList *list, Note *note) {

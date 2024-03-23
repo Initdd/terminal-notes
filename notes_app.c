@@ -204,6 +204,11 @@ void handle_input_main_window_new_note(int key, int *selected_idx, int *main_win
                     break;
                 case 3:  // submit
                     // validate the provided data and group
+                    // check if the data is empty
+                    // if it is, ignore the note
+                    if (strlen(*data) == 0) break;
+                    // check if the group is empty
+                    // if it is, set the group to the default group
                     if (strlen(*group) == 0) strcpy(*group, NOTE_GROUP_DEFAULT);
                     // create a new note and add it to the list
                     Note *new_note = notes_create(*data, *priority, *group);
@@ -313,6 +318,7 @@ void handle_input_main_window_edit_note(int key, int *selected_idx, int *main_wi
                     // edit the note
                     // validate the provided data and group
                     if (strlen(*group) == 0) strcpy(*group, NOTE_GROUP_DEFAULT);
+                    if (strlen(*data) == 0) data = NULL;
                     // update the note
                     Note *note = notes_list_get_by_id(note_list, *note_id);
                     notes_update(note, *data, *priority, *group);

@@ -1,9 +1,9 @@
 <!-- Images -->
 <div style="display: flex;margin-bottom:5%;">
     <img src="./assets/example_notes.png"
-    style="width: 50%;border:2px solid #30363d;margin-right:2px;" />
+    style="width: 49%;border:2px solid #30363d;margin-right:2px;" />
     <img src="./assets/example_groups.png"
-    style="width: 50%;border:2px solid #30363d;margin-left:2px;" />
+    style="width: 49%;border:2px solid #30363d;margin-left:2px;" />
 </div>
 
 # Notes App

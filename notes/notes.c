@@ -332,7 +332,7 @@ void notes_list_save(NoteList *list, char *path, char delimiter) {
 	for (int i = 0; i < list->size; i++) {
 		// write the note to the file
 		// format: priority:group:data
-		fprintf(file, "%d%c%s%c%s\n", list->list[i]->prt, delimiter, list->list[i]->group, ' ', list->list[i]->data);
+		fprintf(file, "%d%c%s%c%s\n", list->list[i]->prt, delimiter, list->list[i]->group, delimiter, list->list[i]->data);
 	}
 	// close the file
 	fclose(file);
@@ -340,29 +340,62 @@ void notes_list_save(NoteList *list, char *path, char delimiter) {
 
 // Load a list of notes from a file
 NoteList *notes_list_load(char *path, char delimiter) {
-	// load the list from the file
-	// open the file
-	FILE *file = fopen(path, "r");
-	// check if the file exists
-	if (file == NULL) return NULL;
-	// create a new list
-	NoteList *list = notes_list_create();
-	// read the file
-	int prt;
-	char group[255];
-	char data[255];
-	char *format = "%d%c%[^ ]%c%[^\n]"; // TODO: check format on file
-	while (fscanf(file, format, &prt, &delimiter, group, &delimiter, data) != EOF) {
-		// add the note to the list
-		// create the note
-		Note *note = notes_create(data, prt, group);
-		// check if the note was created, if not, continue
-		if (note == NULL) continue;
-		// add the note to the list
-		notes_list_add(list, note);
-	}
-	// close the file
-	fclose(file);
-	// return the list
-	return list;
+    // Open the file
+    FILE *file = fopen(path, "r");
+    if (file == NULL) {
+        perror("Error opening file");
+        return NULL;
+    }
+
+    // Create a new list
+    NoteList *list = notes_list_create();
+
+    // Read the file line by line
+    char *line = NULL;
+    size_t bufsize = 0;
+    size_t linelen;
+    while ((linelen = getline(&line, &bufsize, file)) != -1) {
+        // Check if the line is empty or too short
+        if (linelen <= 1) continue;
+        
+        // Remove the end of line character
+        line[linelen - 1] = '\0';
+
+        // Split the line into the note data
+        char *token = strtok(line, &delimiter);
+        if (token == NULL) continue; // Empty line
+        
+        // Get the priority
+        int prt = atoi(token);
+
+        // Get the group
+        token = strtok(NULL, &delimiter);
+        if (token == NULL) continue; // Missing group
+        char group[255];
+        strncpy(group, token, sizeof(group) - 1);
+        group[sizeof(group) - 1] = '\0'; // Ensure null-terminated
+        
+        // Get the data
+        token = strtok(NULL, &delimiter);
+        if (token == NULL) continue; // Missing data
+        char data[255];
+        strncpy(data, token, sizeof(data) - 1);
+        data[sizeof(data) - 1] = '\0'; // Ensure null-terminated
+
+        // Create the note
+        Note *note = notes_create(data, prt, group);
+        if (note == NULL) continue; // Error creating note
+
+        // Add the note to the list
+        notes_list_add(list, note);
+    }
+
+    // Free dynamically allocated memory
+    free(line);
+
+    // Close the file
+    fclose(file);
+
+    // Return the list
+    return list;
 }

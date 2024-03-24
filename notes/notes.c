@@ -14,6 +14,16 @@ static int digitNum(int n) { // returns the number of digits in a number
     return 1 + digitNum(n / 10);
 }
 
+static int note_validate(char *data, int prt, char *group) {
+	// validate the priority, data and group
+	if (prt < 0 || prt > NOTE_PRIORITY_MAX) return 0;
+	if (
+		strlen(data) == 0 	// data is empty
+		|| strlen(group) == 0	// group is empty
+	) return 0;
+	return 1;
+}
+
 /*
  * Note Structure managing functions
  * 
@@ -21,9 +31,10 @@ static int digitNum(int n) { // returns the number of digits in a number
 */
 
 Note *notes_create(char *data, int prt, char *group) {
-	// validate the priority and data
-	if (prt < 0 || prt > NOTE_PRIORITY_MAX) return NULL;
+	// validate the priority, data and group
 	if (data == NULL) return NULL;
+	if (group == NULL) return NULL;
+	if (!note_validate(data, prt, group)) return NULL;
 	// alocate memory for the new note
 	Note *note = (Note *)malloc(sizeof note);
 	// set the note data
@@ -64,7 +75,7 @@ char *notes_read(Note *note, char separator) {
 
 void notes_update(Note *note, char *data, int prt, char *group) {
 	// update the note data if the new data is not NULL
-	if (data != NULL) {
+	if (data != NULL && strlen(data) > 0) {
 		// free the old data
 		free(note->data);
 		// allocate memory for the new data
@@ -77,7 +88,7 @@ void notes_update(Note *note, char *data, int prt, char *group) {
 		note->prt = prt;
 	}
 	// update the note group if the new group is not NULL
-	if (group != NULL) {
+	if (group != NULL && strlen(group) > 0) {
 		// free the old group
 		free(note->group);
 		note->group = NULL;
@@ -237,6 +248,8 @@ char **notes_list_get_groups(NoteList *list, int *list_size) {
 
 void notes_list_add(NoteList *list, Note *note) {
 	// add the note to the list
+	// check if the note is NULL
+	if (note == NULL) return;
 	// check if the list is full
 	if (list->size == list->capacity) {
 		// if it is, double the capacity

@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <string.h>
 // local libraries
-#include "../notes.h"
+#include "../notes_manager.h"
 
 // generic variables
 #define FILENAME "test.txt"

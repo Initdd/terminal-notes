@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 // local libraries
-#include "../notes.h"
+#include "../notes_manager.h"
 
 void test_notes_list_create() {
     // create a new note list

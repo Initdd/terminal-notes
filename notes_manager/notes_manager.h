@@ -12,6 +12,9 @@
  *  Author: Initdd
 */
 
+#ifndef NOTES_MANAGER_H
+#define NOTES_MANAGER_H
+
 /*
  * Macros for the Note Data Structure
 */
@@ -197,4 +200,4 @@ NoteList *notes_list_load(char *filename, char delimiter);
 */
 void notes_list_save(NoteList *list, char *filename, char delimiter);
 
-
+#endif // NOTES_MANAGER_H

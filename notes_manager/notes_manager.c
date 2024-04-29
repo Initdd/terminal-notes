@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 // Local includes
-#include "notes.h"
+#include "notes_manager.h"
 
 // local functions
 static int digitNum(int n) { // returns the number of digits in a number

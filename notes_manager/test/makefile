@@ -2,8 +2,8 @@ args = -Wall -g
 test_notes = notes_test
 test_list_notes = notes_list_test
 test_files_notes = notes_files_test
-lib = notes
-lib_path = ../notes
+lib = notes_manager
+lib_path = ../notes_manager
 
 all: get_all clean_residue
 

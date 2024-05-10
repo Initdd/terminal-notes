@@ -15,6 +15,7 @@
 #include <string.h>
 #include <ncurses.h>
 #include <signal.h>
+#include <sys/stat.h>
 
 // Local libraries
 #include "./notes_manager/notes_manager.h"
@@ -23,13 +24,21 @@
 
 // Constants
 // file path for the notes
-#define DATA "./data"
+#ifdef DEVMODE
+#define DATA_DIR "./"
+#define DATA DATA_DIR "data"
+#else
+#define DATA_DIR "%s/.local/share/notes_app/"
+#define DATA "data"
+#endif
+
 // format of the notes in the file
 #define DEL '-'
 
 // Global variables
 volatile sig_atomic_t quit_flag = 1;
 NoteList *note_list;
+char *data_dir;
 
 // utility variables
 int priority = 0;
@@ -59,7 +68,7 @@ void print_to_terminal(const char* pat, void *msg) {
 
 // handle signal ctrl c
 void end_app() {
-    notes_list_save(note_list, DATA, DEL);
+    notes_list_save(note_list, data_dir, DEL);
     notes_list_delete(note_list);
     // free the data
     if (data != NULL) {
@@ -87,6 +96,11 @@ void end_app() {
         free(group_notes_list->list);
         free(group_notes_list);
         group_notes_list = NULL;
+    }
+    // free the data_dir
+    if (data_dir != NULL) {
+        free(data_dir);
+        data_dir = NULL;
     }
     // close the windows
     delwin(menu_win);
@@ -137,8 +151,50 @@ void init_display() {
 
 // Main function
 int main(int argc, char *argv[]) {
-    // Notes
-    note_list = notes_list_load(DATA, DEL);
+
+    // setup the data directory
+    char *notes_dir_path;
+    #ifdef DEVMODE
+    notes_dir_path = malloc(strlen(DATA_DIR) + 1);
+    sprintf(notes_dir_path, DATA_DIR);
+    data_dir = malloc(strlen(notes_dir_path) + strlen(DATA) + 1);
+    sprintf(data_dir, "%s%s", notes_dir_path, DATA);
+    #else
+    char *home = (char *) getenv("HOME");
+    notes_dir_path = (char *) malloc(strlen(home) + strlen(DATA_DIR) + 1);
+    sprintf(notes_dir_path, DATA_DIR, home);
+    data_dir = (char *) malloc(strlen(notes_dir_path) + strlen(DATA) + 1);
+    sprintf(data_dir, "%s%s", notes_dir_path, DATA);
+    #endif
+
+    // Check if DATA exists, and if not, create it
+    FILE *data_file = fopen(data_dir, "r");
+    if (data_file == NULL) {
+        #ifndef DEVMODE
+        // create directory notes_app in ~/.local/share if does not exist yet
+        struct stat st = {0};
+        if (stat(notes_dir_path, &st) == -1) {
+            mkdir(notes_dir_path, 0600); // permissions: -rw-------
+        }
+        #endif
+        // create the data file
+        data_file = fopen(data_dir, "w");
+        if (data_file == NULL) {
+            printf("Error: Failed to create the data file\n");
+            free(notes_dir_path);
+            return 1;
+        }
+        printf("Data file created\n");
+        fclose(data_file);
+    } else {
+        fclose(data_file);
+    }
+
+    // free the notes_dir_path
+    free(notes_dir_path);
+    
+    // Get the notes
+    note_list = notes_list_load(data_dir, DEL);
     // check if the notes were loaded successfully
     if (note_list == NULL) {
         printf("Error: Failed to load the notes: Data file not found\n");
@@ -175,7 +231,7 @@ int main(int argc, char *argv[]) {
             return 0;
         }
     }
-    
+
     // Initialize the display
     init_display();
 

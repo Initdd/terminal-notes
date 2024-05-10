@@ -184,7 +184,6 @@ int main(int argc, char *argv[]) {
             free(notes_dir_path);
             return 1;
         }
-        printf("Data file created\n");
         fclose(data_file);
     } else {
         fclose(data_file);

@@ -259,9 +259,5 @@ int main(int argc, char *argv[]) {
                     2, &main_window_mode, &selected_idx, note_list, &priority, &data, &note_id, &group, &group_list, &group_list_size, &group_notes_list);
     }
 
-    // close windows
-    delwin(menu_win);
-    delwin(main_note_win);
-
     end_app();
 }

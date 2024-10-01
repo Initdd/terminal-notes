@@ -116,7 +116,7 @@ int handle_input_main_window_new_note(int key, int *selected_idx, int *main_wind
             switch (*selected_idx) {
                 case 0:  // priority
                     // check if the key is a number between 0 and 5
-                    if (key >= '1' && key <= '5') {
+                    if (key >= '1' && key <= '3') {
                         *priority = key - '0';
                     }
                     break;

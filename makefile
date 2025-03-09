@@ -5,29 +5,35 @@ window_manager = window_manager
 notes = ./$(notes_manager)/notes_manager.c
 windows = ./$(window_manager)/window_manager.c
 dev_mode = -DDEVMODE
+build_dir = build
 
-#all: $(app) 
+all: dev # The default target is the development mode
 
-all: $(app).o $(notes_manager).o $(window_manager).o
-	gcc -o $(app) ./$(app).o ./$(notes_manager).o ./$(window_manager).o $(options) -lcurses
+prod: $(build_dir)/$(app).o $(build_dir)/$(notes_manager).o $(build_dir)/$(window_manager).o
+	gcc -o $(build_dir)/$(app) $(build_dir)/$(app).o $(build_dir)/$(notes_manager).o $(build_dir)/$(window_manager).o $(options) -lcurses
 
-dev: $(app)_dev.o $(notes_manager).o $(window_manager).o
-	gcc -o $(app) ./$(app).o ./$(notes_manager).o ./$(window_manager).o $(options) -lcurses
+dev: $(build_dir)/$(app)_dev.o $(build_dir)/$(notes_manager).o $(build_dir)/$(window_manager).o
+	gcc -o $(build_dir)/$(app) $(build_dir)/$(app).o $(build_dir)/$(notes_manager).o $(build_dir)/$(window_manager).o $(options) -lcurses
 
-$(app).o: $(app).c
-	gcc -o $(app).o $(app).c -c $(options) 
+$(build_dir)/$(app).o: $(app).c
+	mkdir -p $(build_dir)
+	gcc -o $(build_dir)/$(app).o $(app).c -c $(options) 
 
-$(app)_dev.o: $(app).c
-	gcc $(dev_mode) -o $(app).o $(app).c -c $(options)
+$(build_dir)/$(app)_dev.o: $(app).c
+	mkdir -p $(build_dir)
+	gcc $(dev_mode) -o $(build_dir)/$(app).o $(app).c -c $(options)
 
-$(notes_manager).o: 
-	gcc -o $(notes_manager).o $(notes) -c $(options)
+$(build_dir)/$(notes_manager).o: 
+	mkdir -p $(build_dir)
+	gcc -o $(build_dir)/$(notes_manager).o $(notes) -c $(options)
 
-$(window_manager).o:
-	gcc -o $(window_manager).o $(windows) -c $(options)
+$(build_dir)/$(window_manager).o:
+	mkdir -p $(build_dir)
+	gcc -o $(build_dir)/$(window_manager).o $(windows) -c $(options)
 
 clean: clean_residue
-	rm -f $(app)
+	rm -f $(build_dir)/$(app)
 
 clean_residue:
-	rm -f *.o
+	rm -f $(build_dir)/*.o
+	rm -rf $(build_dir)

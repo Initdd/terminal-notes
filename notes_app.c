@@ -255,8 +255,8 @@ int main(int argc, char *argv[]) {
                         bg_colour = "\033[47m";    // White background
                         break;
                     case 2:
-                        color_bgn = "\033[1;33m";  // Bold yellow
-                        bg_colour = "\033[46m";    // Cyan background
+                        color_bgn = "\033[1;30m";  // Bold black
+                        bg_colour = "\033[42m";    // Green background
                         break;
                     case 3:
                         color_bgn = "\033[1;37m";  // Bold white
